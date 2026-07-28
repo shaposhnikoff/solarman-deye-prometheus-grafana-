@@ -1,0 +1,176 @@
+{
+  "annotations": {"list": []},
+  "description": "Deye Hybrid inverter metrics exported by solarman-prometheus-exporter.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [{"options": {"0": {"color": "red", "text": "Offline"}, "1": {"color": "green", "text": "Online"}}, "type": "value"}], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "solarman_up{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "", "refId": "A"}],
+      "title": "Связь с инвертором",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "continuous-GrYlRd"}, "decimals": 0, "max": 1, "min": 0, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "orange", "value": 0.2}, {"color": "green", "value": 0.5}]}, "unit": "percentunit"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "solarman_battery_soc_ratio{serial=~\"$serial\", inverter=~\"$inverter\"}", "refId": "A"}],
+      "title": "Заряд батареи",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"decimals": 0, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0},
+      "id": 3,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "sum(solarman_pv1_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"} + solarman_pv2_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"})", "refId": "A"}],
+      "title": "Мощность PV",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"decimals": 0, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0},
+      "id": 4,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "solarman_battery_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "refId": "A"}],
+      "title": "Мощность батареи",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"decimals": 0, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0},
+      "id": 5,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "solarman_total_grid_power_watts_total{serial=~\"$serial\", inverter=~\"$inverter\"}", "refId": "A"}],
+      "title": "Мощность сети",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"decimals": 0, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 0},
+      "id": 6,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "solarman_total_load_power_watts_total{serial=~\"$serial\", inverter=~\"$inverter\"}", "refId": "A"}],
+      "title": "Нагрузка",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"custom": {"drawStyle": "line", "fillOpacity": 12, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": false}, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "id": 7,
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "solarman_pv1_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "PV1", "refId": "A"},
+        {"expr": "solarman_pv2_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "PV2", "refId": "B"},
+        {"expr": "solarman_inverter_l1_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Инвертор L1", "refId": "C"},
+        {"expr": "solarman_inverter_l2_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Инвертор L2", "refId": "D"}
+      ],
+      "title": "Солнечная генерация и выход инвертора",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"custom": {"drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "showPoints": "never"}, "unit": "watt"}, "overrides": [{"matcher": {"id": "byName", "options": "SOC"}, "properties": [{"id": "unit", "value": "percentunit"}, {"id": "custom.axisPlacement", "value": "right"}]}]},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "id": 8,
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "solarman_battery_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Мощность", "refId": "A"},
+        {"expr": "solarman_battery_soc_ratio{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "SOC", "refId": "B"}
+      ],
+      "title": "Батарея: мощность и заряд",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"custom": {"drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "showPoints": "never"}, "unit": "watt"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "id": 9,
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "solarman_total_grid_power_watts_total{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Сеть", "refId": "A"},
+        {"expr": "solarman_total_load_power_watts_total{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Нагрузка", "refId": "B"},
+        {"expr": "solarman_external_ct_l1_power_watts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "CT L1", "refId": "C"}
+      ],
+      "title": "Сеть и нагрузка",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"custom": {"drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "showPoints": "never"}, "unit": "volt"}, "overrides": [{"matcher": {"id": "byRegexp", "options": "/Температура/"}, "properties": [{"id": "unit", "value": "celsius"}, {"id": "custom.axisPlacement", "value": "right"}]}]},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "id": 10,
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "solarman_battery_voltage_volts{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Напряжение батареи", "refId": "A"},
+        {"expr": "solarman_battery_temperature_celsius{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Температура батареи", "refId": "B"},
+        {"expr": "solarman_ac_temperature_celsius{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Температура AC", "refId": "C"}
+      ],
+      "title": "Напряжение и температура батареи",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"decimals": 2, "unit": "kwatth"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "id": 11,
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [
+        {"expr": "solarman_daily_production_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Генерация", "refId": "A"},
+        {"expr": "solarman_daily_load_consumption_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Потребление", "refId": "B"},
+        {"expr": "solarman_daily_battery_charge_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Заряд батареи", "refId": "C"},
+        {"expr": "solarman_daily_battery_discharge_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Разряд батареи", "refId": "D"},
+        {"expr": "solarman_daily_energy_bought_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Куплено", "refId": "E"},
+        {"expr": "solarman_daily_energy_sold_joules{serial=~\"$serial\", inverter=~\"$inverter\"} / 3600000", "legendFormat": "Продано", "refId": "F"}
+      ],
+      "title": "Энергия за сегодня",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"custom": {"drawStyle": "line", "fillOpacity": 5, "lineWidth": 2, "showPoints": "never"}, "unit": "s"}, "overrides": [{"matcher": {"id": "byName", "options": "Успешность"}, "properties": [{"id": "unit", "value": "none"}, {"id": "min", "value": 0}, {"id": "max", "value": 1}]}]},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "id": 12,
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "solarman_data_age_seconds{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Возраст данных", "refId": "A"},
+        {"expr": "solarman_poll_duration_seconds{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Длительность опроса", "refId": "B"},
+        {"expr": "solarman_up{serial=~\"$serial\", inverter=~\"$inverter\"}", "legendFormat": "Успешность", "refId": "C"}
+      ],
+      "title": "Здоровье exporter’а",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 39,
+  "tags": ["solarman", "deye", "solar", "prometheus"],
+  "templating": {
+    "list": [
+      {"current": {}, "hide": 0, "includeAll": false, "label": "Prometheus", "name": "DS_PROMETHEUS", "options": [], "query": "prometheus", "refresh": 1, "type": "datasource"},
+      {"allValue": ".*", "current": {"text": "1126866902", "value": "1126866902"}, "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "definition": "label_values(solarman_up, serial)", "hide": 0, "includeAll": true, "label": "Серийный номер", "multi": false, "name": "serial", "options": [], "query": {"query": "label_values(solarman_up, serial)", "refId": "StandardVariableQuery"}, "refresh": 1, "regex": "", "sort": 1, "type": "query"},
+      {"allValue": ".*", "current": {"text": "deye", "value": "deye"}, "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "definition": "label_values(solarman_up, inverter)", "hide": 0, "includeAll": true, "label": "Инвертор", "multi": false, "name": "inverter", "options": [], "query": {"query": "label_values(solarman_up, inverter)", "refId": "StandardVariableQuery"}, "refresh": 1, "regex": "", "sort": 1, "type": "query"}
+    ]
+  },
+  "time": {"from": "now-24h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Solarman Deye — обзор",
+  "uid": "solarman-deye-overview",
+  "version": 1,
+  "weekStart": ""
+}

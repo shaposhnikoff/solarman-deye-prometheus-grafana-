@@ -1,0 +1,14 @@
+services:
+  solarman-exporter:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "9800:9800"
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

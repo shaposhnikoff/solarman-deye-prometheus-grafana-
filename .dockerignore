@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+.env
+.pytest_cache
+.ruff_cache
+__pycache__
+*.py[cod]
+custom_components/solarman/translations
+custom_components/solarman/services.yaml
+*.png
