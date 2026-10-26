@@ -43,3 +43,31 @@ Import [`grafana/solarman-overview.json`](grafana/solarman-overview.json) and ch
 | `SOLARMAN_POLL_INTERVAL_SECONDS` | `15` | Polling interval |
 | `SOLARMAN_READY_MAX_AGE_SECONDS` | `45` | Maximum age of data for readiness |
 | `SOLARMAN_PROFILE_PATH` | bundled profile | Absolute path to another compatible profile |
+
+## systemd deployment on the monitoring host
+
+The deployed checkout is `/home/max/solarman-deye-prometheus-grafana-` on `192.168.10.68`.
+The unit source is [`deploy/systemd/solarman-exporter.service`](deploy/systemd/solarman-exporter.service);
+the installed unit is `/etc/systemd/system/solarman-exporter.service`.
+It runs the local `.venv/bin/solarman-exporter` as user `max`, and the application loads
+the ignored `.env` file from the checkout. Do not commit or print that file.
+
+Install or refresh the unit after reviewing changes:
+
+```bash
+sudo install -m 0644 deploy/systemd/solarman-exporter.service /etc/systemd/system/
+sudo systemd-analyze verify /etc/systemd/system/solarman-exporter.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now solarman-exporter.service
+```
+
+Check `systemctl status solarman-exporter.service`,
+`journalctl -u solarman-exporter.service -n 50 --no-pager`,
+`curl http://192.168.10.68:9800/ready`, and Prometheus job `deye`.
+The old Supervisor program `solarman` has autostart and autorestart disabled;
+keep it stopped while the systemd unit is active.
+
+The Modbus RTU exporter is a different project:
+[`deye-6-modbus-management`](https://github.com/shaposhnikoff/deye-6-modbus-management).
+It runs on `192.168.10.39:9101` as `deye-monitoring.service` and is scraped
+by the separate Prometheus job `deye-modbus`.

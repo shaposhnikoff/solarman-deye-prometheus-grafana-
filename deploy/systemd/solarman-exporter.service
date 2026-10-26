@@ -1,0 +1,16 @@
+[Unit]
+Description=Solarman V5 Prometheus exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=max
+Group=max
+WorkingDirectory=/home/max/solarman-deye-prometheus-grafana-
+ExecStart=/home/max/solarman-deye-prometheus-grafana-/.venv/bin/solarman-exporter
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
