@@ -76,6 +76,43 @@ def metric_specs(profile: dict[str, Any]) -> list[MetricSpec]:
     return specs
 
 
+@dataclass(frozen=True, slots=True)
+class StatusSpec:
+    """A lookup profile field and its numeric and labelled representations."""
+
+    field_name: str
+    metric_name: str
+    info_metric_name: str
+    key_by_label: dict[str, int]
+    description: str
+
+
+def status_specs(profile: dict[str, Any]) -> list[StatusSpec]:
+    """Derive metrics for profile fields that map register keys to labels."""
+    specs: list[StatusSpec] = []
+    names: set[str] = set()
+    for group in profile["parameters"]:
+        for field in group["items"]:
+            if "lookup" not in field or field["rule"] not in {1, 2, 3, 4}:
+                continue
+            base = f"solarman_{normalize_metric_name(field['name'])}"
+            info_name = f"{base}_info"
+            if base in names or info_name in names:
+                raise ValueError(f"duplicate Prometheus status metric name generated: {base}")
+            names.update({base, info_name})
+            key_by_label = {str(option["value"]): int(option["key"]) for option in field["lookup"]}
+            specs.append(
+                StatusSpec(
+                    field_name=field["name"],
+                    metric_name=base,
+                    info_metric_name=info_name,
+                    key_by_label=key_by_label,
+                    description=f"Solarman {field['name']}",
+                )
+            )
+    return specs
+
+
 class PrometheusMetrics:
     """Store the last complete Solarman snapshot in a private Prometheus registry."""
 
@@ -83,6 +120,13 @@ class PrometheusMetrics:
         self.registry = CollectorRegistry(auto_describe=True)
         self._label_values = {"serial": str(serial), "inverter": inverter_name}
         self._specs = metric_specs(profile)
+        self._statuses = status_specs(profile)
+        numeric_names = {spec.metric_name for spec in self._specs}
+        for spec in self._statuses:
+            if spec.metric_name in numeric_names or spec.info_metric_name in numeric_names:
+                raise ValueError(
+                    f"status metric collides with a numeric metric: {spec.metric_name}"
+                )
         self._values = {
             spec.field_name: Gauge(
                 spec.metric_name,
@@ -92,6 +136,25 @@ class PrometheusMetrics:
             )
             for spec in self._specs
         }
+        self._status_values = {
+            spec.field_name: Gauge(
+                spec.metric_name,
+                f"{spec.description} key",
+                labelnames=("serial", "inverter"),
+                registry=self.registry,
+            )
+            for spec in self._statuses
+        }
+        self._status_info = {
+            spec.field_name: Gauge(
+                spec.info_metric_name,
+                f"{spec.description} state",
+                labelnames=("serial", "inverter", "state"),
+                registry=self.registry,
+            )
+            for spec in self._statuses
+        }
+        self._active_states: dict[str, str] = {}
         self._up = self._gauge("solarman_up", "Whether the last Solarman poll succeeded")
         self._last_success = self._gauge(
             "solarman_last_success_timestamp_seconds", "Unix timestamp of the last successful poll"
@@ -123,6 +186,20 @@ class PrometheusMetrics:
                     self._values[spec.field_name].labels(**self._label_values).set(
                         value * spec.conversion_factor
                     )
+            for spec in self._statuses:
+                label = values.get(spec.field_name)
+                if not isinstance(label, str):
+                    continue
+                key = spec.key_by_label.get(label)
+                if key is None:
+                    continue
+                self._status_values[spec.field_name].labels(**self._label_values).set(key)
+                info = self._status_info[spec.field_name]
+                previous = self._active_states.get(spec.field_name)
+                if previous is not None and previous != label:
+                    info.labels(**self._label_values, state=previous).set(0)
+                info.labels(**self._label_values, state=label).set(1)
+                self._active_states[spec.field_name] = label
         self._up.labels(**self._label_values).set(1 if successful else 0)
         self._duration.labels(**self._label_values).set(status.duration_seconds)
         self._failures.labels(**self._label_values).set(status.failures_total)

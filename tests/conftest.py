@@ -38,6 +38,17 @@ def sample_profile() -> dict:
                         "isstr": True,
                         "lookup": [{"key": 65535, "value": "Charge"}],
                     },
+                    {
+                        "name": "Grid-connected Status",
+                        "uom": "",
+                        "rule": 1,
+                        "registers": [2],
+                        "isstr": True,
+                        "lookup": [
+                            {"key": 0, "value": "Off-Grid"},
+                            {"key": 1, "value": "On-Grid"},
+                        ],
+                    },
                 ],
             }
         ],

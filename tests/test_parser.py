@@ -13,4 +13,5 @@ def test_parser_decodes_signed_values_and_lookups() -> None:
         "Total Production": 5,
         "Battery SOC": 5,
         "Battery Status": "Charge",
+        "Grid-connected Status": 5,
     }
